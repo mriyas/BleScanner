@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">ImsafeDemo</string>
+    <string name="warning_msg_enableBle">Turn on bluetooth</string>
+</resources>
