@@ -4,14 +4,10 @@ import android.annotation.TargetApi
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.bluetooth.BluetoothDevice
 import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
 import android.content.Intent
 import android.graphics.Color
-import android.hardware.Sensor
-import android.hardware.SensorEvent
-import android.hardware.SensorEventListener
 import android.os.Build
 import android.os.IBinder
 import android.util.Log
@@ -19,12 +15,11 @@ import androidx.lifecycle.LifecycleService
 import java.text.SimpleDateFormat
 import java.util.*
 
-class EndlessService : LifecycleService(), SensorEventListener {
+class EndlessService : LifecycleService() {
 
 
-    private val NORMAL_NOTIFICATION_ID = 2147483647
-    private val ERROR_NOTIFICATION_BLUETOOTH_ID = 2147483645
-
+    private val NORMAL_NOTIFICATION_ID = 125
+    private val ERROR_NOTIFICATION_BLUETOOTH_ID = 126
 
     var mServiceStartTime: Long = 0
     var mBleScanRestartCounter: Long = 0
@@ -75,13 +70,6 @@ class EndlessService : LifecycleService(), SensorEventListener {
 
     }
 
-
-    private fun showNotificationForMockLocation() {
-        createErrorNotification(
-                getString(R.string.app_name),
-                "mockLocationEnabled"
-        )
-    }
 
     override fun onDestroy() {
         super.onDestroy()
@@ -137,7 +125,10 @@ class EndlessService : LifecycleService(), SensorEventListener {
 
                     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
                     override fun onScanResult(callbackType: Int, result: ScanResult) {
-                        Log.i("onScanResult", "onScanResult() : rssi: "+ result.rssi +"  Mac Address:  "+ result.device.address)
+                        Log.i(
+                            "onScanResult",
+                            "onScanResult() : rssi: " + result.rssi + "  Mac Address:  " + result.device.address
+                        )
                     }
 
                     override fun onScanFailed(errorCode: Int) {
@@ -171,9 +162,9 @@ class EndlessService : LifecycleService(), SensorEventListener {
         val bUtility = WiSeMeshBluetoothScanUtility(application)
         if (!bUtility.isBluetoothEnabled) {
             createErrorNotification(
-                    getString(R.string.app_name),
-                    getString(R.string.warning_msg_enableBle),
-                    ERROR_NOTIFICATION_BLUETOOTH_ID
+                getString(R.string.app_name),
+                getString(R.string.warning_msg_enableBle),
+                ERROR_NOTIFICATION_BLUETOOTH_ID
             )
             return false
         }
@@ -197,20 +188,6 @@ class EndlessService : LifecycleService(), SensorEventListener {
         }
     }
 
-    @Throws(Exception::class)
-    private fun processScanResult(
-            bluetoothDevice: BluetoothDevice?,
-            bytes: ByteArray?,
-            rssi: Int
-    ) {
-
-        try {
-            Log.v("TAG", "processScanResult() : BLE SCAN RESULT FOUND....!")
-
-        } catch (ex: Exception) {
-            throw ex
-        }
-    }
 
     private fun getFormattedDate(date: Long): String {
         val formatter = SimpleDateFormat("dd MMM yyyy hh:mm:ss a")
@@ -224,9 +201,9 @@ class EndlessService : LifecycleService(), SensorEventListener {
     }
 
     private fun createErrorNotification(
-            errorDesc: String,
-            messageBody: String,
-            notificationId: Int = 12341
+        errorDesc: String,
+        messageBody: String,
+        notificationId: Int = 12341
     ) {
 
         val subText = getFormattedDate(System.currentTimeMillis())
@@ -237,9 +214,9 @@ class EndlessService : LifecycleService(), SensorEventListener {
         var channelId = notificationManager.channelId
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
-                    channelId,
-                    "Demo",
-                    NotificationManager.IMPORTANCE_DEFAULT
+                channelId,
+                "Demo",
+                NotificationManager.IMPORTANCE_DEFAULT
             )
             notificationManager.createNotificationChannel(channel)
         }
@@ -259,20 +236,20 @@ class EndlessService : LifecycleService(), SensorEventListener {
         messageBody = "$messageBody  $subText"
 
         return createNotification(
-                NORMAL_NOTIFICATION_ID,
-                "Service Running",
-                subText,
-                "",
-                getString(R.string.app_name)
+            NORMAL_NOTIFICATION_ID,
+            "Service Running",
+            subText,
+            "",
+            getString(R.string.app_name)
         )
     }
 
     private fun createNotification(
-            notificationId: Int,
-            title: String,
-            subText: String,
-            messageBody: String,
-            channelName: String
+        notificationId: Int,
+        title: String,
+        subText: String,
+        messageBody: String,
+        channelName: String
     ): Notification {
 
 
@@ -284,9 +261,9 @@ class EndlessService : LifecycleService(), SensorEventListener {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 
             val channel = NotificationChannel(
-                    notificationChannelId,
-                    channelName,
-                    NotificationManager.IMPORTANCE_HIGH
+                notificationChannelId,
+                channelName,
+                NotificationManager.IMPORTANCE_HIGH
             ).let {
                 it.description = channelName
                 it.enableLights(true)
@@ -302,42 +279,15 @@ class EndlessService : LifecycleService(), SensorEventListener {
         imSafeNotificationManager.notificationId = notificationId
         val intent = Intent(this, MainActivity::class.java)
         imSafeNotificationManager.createNotification(
-                title,
-                messageBody,
-                subText,
-                intent
+            title,
+            messageBody,
+            subText,
+            intent
         )
 
         return imSafeNotificationManager.notificationBuilder.build()
     }
 
 
-//    var mBleStateReceiver: BleStateReceiver? = null
-//    private fun registerBleStateReciever() {
-//        if (mBleStateReceiver == null) {
-//            mBleStateReceiver = BleStateReceiver()
-//        }
-//        val filter2 = IntentFilter()
-//        filter2.addAction(BluetoothAdapter.ACTION_STATE_CHANGED)
-//        filter2.addAction(LocationManager.PROVIDERS_CHANGED_ACTION)
-//        registerReceiver(mBleStateReceiver, filter2)
-//    }
-//
-//    private fun unRegisterBleStateReciever() {
-//        try {
-//            unregisterReceiver(mBleStateReceiver)
-//
-//        } catch (ex: java.lang.Exception) {
-//            ex.stackTrace
-//        }
-//    }
-
-    override fun onSensorChanged(event: SensorEvent?) {
-        TODO("Not yet implemented")
-    }
-
-    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
-        TODO("Not yet implemented")
-    }
 }
 
