@@ -137,7 +137,7 @@ class EndlessService : LifecycleService(), SensorEventListener {
 
                     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
                     override fun onScanResult(callbackType: Int, result: ScanResult) {
-                        Log.i("onScanResult", "rssi: "+ result.rssi +"  Mac Address:  "+ result.device.address)
+                        Log.i("onScanResult", "onScanResult() : rssi: "+ result.rssi +"  Mac Address:  "+ result.device.address)
                     }
 
                     override fun onScanFailed(errorCode: Int) {
