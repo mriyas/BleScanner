@@ -172,12 +172,12 @@ public class WiSeMeshBluetoothScanUtility {
 
         List<ScanFilter> filters = new ArrayList<ScanFilter>();
 
-        ScanFilter.Builder builder = new ScanFilter.Builder();
+        /*ScanFilter.Builder builder = new ScanFilter.Builder();
         builder.setManufacturerData(0x0197,null);
         ScanFilter filter = builder.build();
-        filters.add(filter);
+        filters.add(filter);*/
 
-        builder = new ScanFilter.Builder();
+        ScanFilter.Builder builder = new ScanFilter.Builder();
         builder.setManufacturerData(0x0197,new byte[]{});
          filter = builder.build();
         filters.add(filter);
